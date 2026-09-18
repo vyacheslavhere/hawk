@@ -4,37 +4,45 @@ pub mod errors;
 pub mod token;
 
 /// Imports
-use crate::{bail, lex::{
-    errors::LexError,
-    token::{Token, TokenKind},
-}};
 use crate::common::span::Span;
+use crate::{
+    bail,
+    lex::{
+        errors::LexError,
+        token::{Token, TokenKind},
+    },
+};
 use miette::NamedSource;
 use std::{str::Chars, sync::Arc};
 
 /// Defines a lexer, an entity that eats
-/// chars buffer and spits out tokens
+/// chars from buffer and spits out tokens
 pub struct Lexer<'s> {
     /// Current file source
     source: Arc<NamedSource<String>>,
 
-    /// Chars lexer iterates on
+    /// Chars buffer lexer
+    /// iterates on
     chars: Chars<'s>,
 
-    /// Current and next
+    /// Current character index
     idx: usize,
+
+    /// Current character
     current: Option<char>,
+
+    /// Next character
     next: Option<char>,
 }
 
-/// Implementation
+/// Default lexer implementation
 impl<'s> Lexer<'s> {
     /// Creates new lexer
-    pub fn new(file: Arc<NamedSource<String>>, source: &'s str) -> Self {
-        let mut chars = source.chars();
+    pub fn new(source: Arc<NamedSource<String>>, text: &'s str) -> Self {
+        let mut chars = text.chars();
         let (current, next) = (chars.next(), chars.next());
         Self {
-            source: file,
+            source,
             chars,
             current,
             next,
@@ -42,7 +50,8 @@ impl<'s> Lexer<'s> {
         }
     }
 
-    /// Takes step in a chars iterator, increments index
+    /// Takes step in a chars iterator,
+    /// increments current character index
     fn advance(&mut self) {
         self.current = self.next.take();
         self.next = self.chars.next();
@@ -50,6 +59,7 @@ impl<'s> Lexer<'s> {
     }
 
     /// Advances char and returns token
+    /// with specified kind and lexeme
     fn advance_with(&mut self, tk: TokenKind, lexeme: &str) -> Token {
         self.advance();
         Token::new(
@@ -60,6 +70,7 @@ impl<'s> Lexer<'s> {
     }
 
     /// Advances char twice and returns token
+    /// with specified kind and lexeme
     fn advance_twice_with(&mut self, tk: TokenKind, lexeme: &str) -> Token {
         self.advance();
         self.advance();
@@ -70,7 +81,7 @@ impl<'s> Lexer<'s> {
         )
     }
 
-    /// Scans unicode codepoint.
+    /// Scans unicode codepoint
     fn scan_unicode_codepoint(&mut self, small: bool) -> char {
         let start_location = self.idx - 1;
 
@@ -133,7 +144,7 @@ impl<'s> Lexer<'s> {
         }
     }
 
-    /// Scans byte codepoint.
+    /// Scans byte codepoint
     fn scan_byte_codepoint(&mut self) -> char {
         let start_location = self.idx - 1;
 
@@ -193,7 +204,7 @@ impl<'s> Lexer<'s> {
         }
     }
 
-    /// Advances escape sequence.
+    /// Advances escape sequence
     fn advance_escape_sequence(&mut self) -> char {
         // Eating `\` char
         self.advance();
@@ -202,7 +213,7 @@ impl<'s> Lexer<'s> {
         let ch = self.current;
         self.advance();
 
-        // Checking character kind.
+        // Checking escape char kind
         match ch {
             Some('n') => '\n',
             Some('r') => '\r',
@@ -219,7 +230,7 @@ impl<'s> Lexer<'s> {
         }
     }
 
-    /// Advances string
+    /// Advances a string enclosed in quotes
     fn advance_string(&mut self) -> Token {
         // Eating `"`
         self.advance();
@@ -301,26 +312,16 @@ impl<'s> Lexer<'s> {
         )
     }
 
-    /// Token kind for id
+    /// Converts id lexeme into a token kind
     fn token_kind_for_id(value: &str) -> TokenKind {
         match value {
-            "for" => TokenKind::For,
-            "while" => TokenKind::While,
-            "until" => TokenKind::Until,
-            "in" => TokenKind::In,
-            "use" => TokenKind::Use,
-            "enum" => TokenKind::Enum,
             "if" => TokenKind::If,
             "else" => TokenKind::Else,
-            "return" => TokenKind::Return,
-            "continue" => TokenKind::Continue,
-            "break" => TokenKind::Break,
-            "as" => TokenKind::As,
-            "true" => TokenKind::Bool,
-            "false" => TokenKind::Bool,
-            "fun" => TokenKind::Fun,
-            "null" => TokenKind::Null,
-            "pick" => TokenKind::Pick,
+            "true" => TokenKind::True,
+            "false" => TokenKind::False,
+            "nil" => TokenKind::Nil,
+            "memoize" => TokenKind::Memoize,
+            "use" => TokenKind::Use,
             _ => TokenKind::Id,
         }
     }
@@ -448,14 +449,6 @@ impl<'s> Iterator for Lexer<'s> {
 
         // Matching current and next
         match (self.current, self.next) {
-            (Some('+'), Some('=')) => Some(self.advance_twice_with(TokenKind::PlusEq, "+=")),
-            (Some('-'), Some('=')) => Some(self.advance_twice_with(TokenKind::MinusEq, "-=")),
-            (Some('*'), Some('=')) => Some(self.advance_twice_with(TokenKind::StarEq, "*=")),
-            (Some('/'), Some('=')) => Some(self.advance_twice_with(TokenKind::SlashEq, "/=")),
-            (Some('%'), Some('=')) => Some(self.advance_twice_with(TokenKind::PercentEq, "%=")),
-            (Some('&'), Some('=')) => Some(self.advance_twice_with(TokenKind::AmpEq, "&=")),
-            (Some('|'), Some('=')) => Some(self.advance_twice_with(TokenKind::BarEq, "|=")),
-            (Some('^'), Some('=')) => Some(self.advance_twice_with(TokenKind::CaretEq, "^=")),
             (Some('&'), Some('&')) => Some(self.advance_twice_with(TokenKind::DoubleAmp, "&&")),
             (Some('|'), Some('|')) => Some(self.advance_twice_with(TokenKind::DoubleBar, "||")),
             (Some('='), Some('=')) => Some(self.advance_twice_with(TokenKind::DoubleEq, "==")),
@@ -463,9 +456,6 @@ impl<'s> Iterator for Lexer<'s> {
             (Some('.'), Some('.')) => Some(self.advance_twice_with(TokenKind::DoubleDot, "..")),
             (Some('>'), Some('=')) => Some(self.advance_twice_with(TokenKind::Ge, ">=")),
             (Some('<'), Some('=')) => Some(self.advance_twice_with(TokenKind::Le, "<=")),
-            (Some('>'), Some(':')) => Some(self.advance_twice_with(TokenKind::GtColon, ">:")),
-            (Some('>'), Some('!')) => Some(self.advance_twice_with(TokenKind::GtBang, ">!")),
-            (Some('-'), Some('>')) => Some(self.advance_twice_with(TokenKind::Arrow, "->")),
             (Some(':'), Some('=')) => Some(self.advance_twice_with(TokenKind::Walrus, ":=")),
             (Some('|'), Some('>')) => Some(self.advance_twice_with(TokenKind::Pipe, "|>")),
             (Some('&'), _) => Some(self.advance_with(TokenKind::Amp, "&")),

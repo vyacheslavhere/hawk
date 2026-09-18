@@ -5,20 +5,15 @@ use std::fmt::Debug;
 /// Represents token kind
 #[derive(Debug, PartialEq, Clone, Eq, Copy)]
 pub enum TokenKind {
-    For,       // `for` keyword
-    While,     // `while` keyword
-    Until,     // `until` keyword
-    In,        // `in` keyword
-    Use,       // `use` keyword
-    Enum,      // `enum` keyword
     If,        // `if` keyword
     Else,      // `else` keyword
-    Return,    // `return` keyword
-    Continue,  // `continue` keyword
-    Break,     // `break` keyword
-    As,        // `as` keyword
-    Fun,       // `fun` keyword
-    Pick,      // `pick` keyword
+    True,      // `true` keyword
+    False,     // `false` keyword
+    Nil,       // `nil` keyword
+    Memoize,   // `memoize` keyword
+    Echo,      // `echo` keyword
+    Match,     // `match` keyword
+    Use,       // `use` keyword
     Comma,     // ,
     Dot,       // .
     Lbrace,    // {
@@ -40,9 +35,6 @@ pub enum TokenKind {
     Ge,        // >=
     Le,        // <=
     Gt,        // >
-    GtColon,   // >:
-    GtBang,    // >!
-    Arrow,     // ->
     Lt,        // <
     Colon,     // :
     Walrus,    // :=
@@ -51,23 +43,14 @@ pub enum TokenKind {
     DoubleBar, // ||
     DoubleAmp, // &&
     BangEq,    // !=
-    PlusEq,    // +=
-    MinusEq,   // -=
-    StarEq,    // *=
-    SlashEq,   // /=
-    CaretEq,   // ^=
-    PercentEq, // %=
-    BarEq,     // |=
-    AmpEq,     // &=
     DoubleDot, // ..
     Number,    // any number
     String,    // "quoted text"
     Id,        // identifier
-    Bool,      // bool
-    Null,      // null
 }
 
-/// Represents token
+/// Defines a token, a structural unit lexer spits out
+/// that contains it's kind, lexeme and source span
 #[derive(Debug, PartialEq, Clone, Eq)]
 pub struct Token {
     pub span: Span,
@@ -75,9 +58,9 @@ pub struct Token {
     pub lexeme: String,
 }
 
-/// Implementation
+/// Token implementation
 impl Token {
-    /// Creates new token
+    /// Creates new token from specified span, kind and lexeme
     pub fn new(span: Span, kind: TokenKind, lexeme: String) -> Self {
         Self { span, kind, lexeme }
     }
