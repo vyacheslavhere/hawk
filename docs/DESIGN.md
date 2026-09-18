@@ -326,15 +326,6 @@ less_then_100 := |n| match n {
 }
 ```
 
-Same code with compare patterns:
-```
-less_then_100 := |n| match n {
-    < 100 -> true,
-    # ^^^
-    _ -> false
-}
-```
-
 Binding patterns:
 ```
 flavour := |item| match item {
