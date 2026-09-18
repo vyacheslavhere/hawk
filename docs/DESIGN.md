@@ -102,7 +102,7 @@ a := "world" # not a mutation, variable shadowing.
 ### Operators
 Hawk supports following binary operations:
 * `==` `!=` `>` `<` `>=` `<=`
-* `&&` `||` `&` `|` `<<` `>>`
+* `&&` `||` `&` `|` `^` `<<` `>>`
 * `+` `-` `*` `/` `%`
 
 Following unary operations:
@@ -162,8 +162,8 @@ a := {
 }
 b := {
     ..a,
-    "total": 50000
-    "currency": "uzs"
+    "total": 50000,
+    "currency": "uzs",
     "discount": 3000
 }
 ```
@@ -222,7 +222,7 @@ fib := |n| {
 ```
 
 ```
-square = |n| n * n
+square := |n| n * n
 ```
 
 All functions which are declared are closures, and have access to their outer scope variables:
@@ -233,7 +233,6 @@ x := |x| {
 }
 y := x(5)
 echo y() # 10
-echo y() # 20
 ```
 
 ### Echoes
@@ -373,7 +372,7 @@ With pipeline:
 io := use "io"
 square := |n| n * n
 
-double(10) |> square(_)  |> io:println(_)
+double(10) |> square(_)  |> io.println(_)
 ```
 
 Wildcard (`_`) here means a position for result of a previous pipeline call
