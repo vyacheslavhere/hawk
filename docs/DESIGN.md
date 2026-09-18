@@ -197,10 +197,20 @@ echo a # [0, 1, 2, 3, 4]
 echo b # [0, 1, 2, 3, 4, 5]
 ```
 
+### Blocks
+You can combine a statements in a block expression:
+```
+sum := {
+    a := 5
+    b := 10
+    a + b
+}
+echo sum # 15
+```
+
 ### Functions
 Functitons are defined with `|param1, param2, ..n| ...` syntax. Here is some examples:
 
-With block as function body:
 ```
 fib := |n| {
     if n <= 1 {
@@ -211,7 +221,6 @@ fib := |n| {
 }
 ```
 
-With expression as function body:
 ```
 square = |n| n * n
 ```
@@ -286,23 +295,25 @@ fib := |n| match n {
 }
 ```
 
-List patterns:
+array patterns:
 ```
-describe := |list| match list {
-  [] -> "list is empty!"
-  [a] -> "list has only one element: " + a
-  [a, b] -> "list has two elements: " + a + " and " + b,
-  [a, b, ..] -> "list has at least two elements: " + a + " and " + b
+describe := |array| match array {
+  [] -> "array is empty!"
+  [a] -> "array has only one element: " + a
+  [a, b] -> "array has two elements: " + a + " and " + b,
+  [a, b, ..] -> "array has at least two elements: " + a + " and " + b
+  [a, b, ..c] -> "array has these elements: " + a + " and " + b + " and: " + c
 }
 ```
 
 Dict patterns:
 ```
 describe := |dict| match dict {
-  {} -> "list is empty!"
+  {} -> "array is empty!"
   {a: b} -> "dict has only one key-value pair: " + a + ":" + b
   {a: _, b: _} -> "dict has two keys: " + a + " and " + b,
   {a: _, b: _, ..} -> "dict has at least two keys: " + a + " and " + b
+  {a: _, b: _, ..c} -> "dict has these keys: " + a + " and " + b + " and these elements: " + c
 }
 ```
 
