@@ -86,7 +86,7 @@ pub enum PatKind {
         rhs: Box<Expr>,
         inclusive: bool,
     },
-    Bind(String),
+    Bind(Ident),
 }
 
 /// Defines a match pattern
