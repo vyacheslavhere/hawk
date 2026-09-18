@@ -1,7 +1,8 @@
+mod common;
 mod io;
 mod lex;
 mod macros;
-mod common;
+mod parse;
 
 fn main() {
     println!("Hello, world!");

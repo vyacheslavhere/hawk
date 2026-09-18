@@ -31,11 +31,12 @@ pub enum TokenKind {
     Amp,       // &
     Bang,      // !
     Bar,       // |
-    Eq,        // =
     Ge,        // >=
     Le,        // <=
     Gt,        // >
     Lt,        // <
+    LtLt,      // <<
+    RtRt,      // >>
     Colon,     // :
     Walrus,    // :=
     Pipe,      // |>
